@@ -1,0 +1,41 @@
+name: Build APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend/android
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Install project dependencies
+        run: yarn install
+        working-directory: frontend
+
+      - name: Install Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build APK (Release)
+        run: ./gradlew assembleRelease
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release.apk
+          path: frontend/android/app/build/outputs/apk/release/app-release.apk
